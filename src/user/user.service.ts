@@ -9,6 +9,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { ErrorHandleService } from 'src/common/exception/exception.controller';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class UserService {
@@ -31,8 +32,23 @@ export class UserService {
     }
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 5, offset = 1 } = paginationDto;
+    const pagination = (offset - 1) * limit;
+    const [total, users] = await Promise.all([
+      this.userModel.countDocuments(),
+      this.userModel.find().limit(limit).skip(pagination).select('-__v'),
+    ]);
+    const totalpages = Math.ceil((total * 1) / limit);
+    const paginating = {
+      before: offset - 1,
+      current: offset,
+      after: offset + 1,
+      total,
+      totalpages,
+    };
+    return { users, paginating };
+    //return this.userModel.find();
   }
 
   async findOne(term: string) {
