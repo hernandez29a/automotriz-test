@@ -1,14 +1,20 @@
-import { Injectable, BadRequestException, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose/dist';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { ErrorHandleService } from 'src/common/exception/exception.controller';
 
 @Injectable()
 export class UserService {
-  private readonly logger = new Logger('UserService');
+  //private readonly logger = new Logger('UserService');
   constructor(
+    private readonly errorHandler: ErrorHandleService,
     // ? Patron Repositorio
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
@@ -21,7 +27,7 @@ export class UserService {
       const user = await this.userModel.create(createUserDto);
       return user;
     } catch (error) {
-      this.handleDBException(error);
+      this.errorHandler.errorHandleException(error);
     }
   }
 
@@ -29,22 +35,49 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(term: string) {
+    let user: User;
+    if (!user) {
+      throw new NotFoundException(
+        `User with id, name: ${term} it's not in the bd`,
+      );
+    }
+
+    return user;
+    //return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    updateUserDto.name = updateUserDto.name.toLocaleLowerCase();
-    updateUserDto.lastname = updateUserDto.lastname.toLocaleLowerCase();
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    let user: User;
+
+    if (updateUserDto.name) {
+      updateUserDto.name = updateUserDto.name.toLocaleLowerCase();
+    }
+
+    if (updateUserDto.lastname) {
+      updateUserDto.lastname = updateUserDto.lastname.toLocaleLowerCase();
+    }
+
+    try {
+      user = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
+        new: true,
+      });
+      return user;
+    } catch (error) {
+      this.errorHandler.errorHandleException(error);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const { deletedCount } = await this.userModel.deleteOne({ _id: id });
+    if (deletedCount === 0) {
+      throw new BadRequestException(`user id: ${id} not found`);
+    }
+    return 'user deleted successfully';
   }
 
   // ? Pintar un error
-  private handleDBException(error: any) {
+  /*private handleDBException(error: any) {
     console.log(error);
     //console.log(error.index, error.code, error.keyPattern);
     if (error.code === '11000') {
@@ -56,5 +89,5 @@ export class UserService {
     throw new BadRequestException(
       `user created ${JSON.stringify(error.keyValue)}`,
     );
-  }
+  }*/
 }
