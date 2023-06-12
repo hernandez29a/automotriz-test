@@ -3,15 +3,20 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
+import { EnvConfiguration } from './config/env.config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      load: [EnvConfiguration],
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
     //MongooseModule.forRoot(process.env.MONGODB),
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/nest-kenility'),
+    MongooseModule.forRoot(process.env.MONGODB),
     UserModule,
     CommonModule,
   ],
