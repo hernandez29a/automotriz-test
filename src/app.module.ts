@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
 import { EnvConfiguration } from './config/env.config';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { EnvConfiguration } from './config/env.config';
     MongooseModule.forRoot(process.env.MONGODB),
     UserModule,
     CommonModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [],
