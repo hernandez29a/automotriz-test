@@ -4,6 +4,7 @@ import {
   IsEmail,
   MaxLength,
   Matches,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -29,5 +30,10 @@ export class CreateUserDto {
   password: string;
 
   @IsString()
+  @IsOptional()
   address: string;
+
+  @IsString()
+  @IsOptional()
+  img: string;
 }
