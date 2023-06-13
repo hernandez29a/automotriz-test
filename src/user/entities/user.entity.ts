@@ -24,7 +24,6 @@ export class User extends Document {
 
   @Prop({
     required: true,
-    select: false,
   })
   password: string;
 
@@ -37,6 +36,17 @@ export class User extends Document {
     default: 'no-posee-imagen',
   })
   img: string;
+
+  @Prop({
+    default: 'USER_ROLE',
+  })
+  rol: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.method('toJSON', function () {
+  const { __v, password, ...user } = this.toObject();
+
+  //user.uid = _id;
+  return user;
+});
