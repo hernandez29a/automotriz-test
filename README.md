@@ -47,6 +47,7 @@ docker-compose up -d
 ```
 npm run start:dev
 ```
+8. Crear un usuario y en la bd cambiar el rol a ADMIN_ROLE para poder eliminar y modificar un usuario
 
 
 ## Stack Usado
