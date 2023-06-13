@@ -21,13 +21,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
   async validate(payload: JwtPayload): Promise<User> {
-    const { email } = payload;
-    const user = await this.userModel.findOne({
-      email: email,
-    });
+    const { id } = payload;
+    const user = await this.userModel.findById({ _id: id });
 
     if (!user) throw new UnauthorizedException(`Token not valid`);
     //console.log({ user });
+
+    // TODO hacer la validacion si el usuario esta activo al momento de eliminar un usuario
+    // !esta validacion no se hizo ya que no estaba en el desafio
     return user;
   }
 }

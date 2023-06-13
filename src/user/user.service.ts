@@ -40,7 +40,7 @@ export class UserService {
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException(`Credential not valids password`);
     // ? retornar el JWT
-    return { user, token: this.getJwtToken({ email: user.email }) };
+    return { user, token: this.getJwtToken({ id: user.id }) };
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -66,7 +66,7 @@ export class UserService {
       // ? retornar el jwt de acceso
       return {
         user,
-        token: this.getJwtToken({ email: user.email }),
+        token: this.getJwtToken({ id: user.id }),
       };
     } catch (error) {
       this.errorHandler.errorHandleException(error);
