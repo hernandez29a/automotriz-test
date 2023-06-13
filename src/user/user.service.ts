@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose/dist';
 import { Model } from 'mongoose';
@@ -11,8 +12,9 @@ import { User } from './entities/user.entity';
 import { ErrorHandleService } from 'src/common/exception/exception.controller';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import * as bcrypt from 'bcrypt';
-import { JwtPayload } from 'src/auth/interfaces/jwt-interface.payload';
+import { JwtPayload } from 'src/user/interfaces/jwt-interface.payload';
 import { JwtService } from '@nestjs/jwt';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class UserService {
@@ -24,6 +26,22 @@ export class UserService {
     private readonly userModel: Model<User>,
     private readonly jwtService: JwtService,
   ) {}
+
+  async login(loginUserDto: LoginUserDto) {
+    const { email, password } = loginUserDto;
+    const user = await this.userModel.findOne({
+      email: email,
+    });
+
+    //console.log(user);
+    if (!user) {
+      throw new NotFoundException(`Credential not valids email`);
+    }
+    if (!bcrypt.compareSync(password, user.password))
+      throw new UnauthorizedException(`Credential not valids password`);
+    // ? retornar el JWT
+    return { user, token: this.getJwtToken({ email: user.email }) };
+  }
 
   async create(createUserDto: CreateUserDto) {
     const { password, ...restoData } = createUserDto;
@@ -45,7 +63,7 @@ export class UserService {
         rol: user.rol,
       };*/
 
-      // TODO retornar el jwt de acceso
+      // ? retornar el jwt de acceso
       return {
         user,
         token: this.getJwtToken({ email: user.email }),

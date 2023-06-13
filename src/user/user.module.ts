@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './entities/user.entity';
 import { CommonModule } from 'src/common/common.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from 'src/auth/strategies/jwt-strategy';
+import { JwtStrategy } from 'src/user/strategies/jwt-strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
@@ -38,5 +38,6 @@ import { JwtModule } from '@nestjs/jwt';
       },
     }),
   ],
+  exports: [MongooseModule, JwtStrategy, PassportModule, JwtModule],
 })
 export class UserModule {}
