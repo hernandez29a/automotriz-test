@@ -123,13 +123,14 @@ export class UserService {
       updateUserDto.lastname = updateUserDto.lastname.toLocaleLowerCase();
     }
 
-    // TODO validar que la contraseña enviada es diferente a la que esta en la bd y actualizarla
+    // ? validar que la contraseña enviada es diferente a la que esta en la bd y actualizarla
     if (password) {
       pass = bcrypt.hashSync(password, 10);
+      //console.log(pass);
     }
 
     const data = {
-      pass,
+      password: pass,
       ...restoData,
     };
 
