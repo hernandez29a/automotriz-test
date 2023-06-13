@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
 import { EnvConfiguration } from './config/env.config';
 import { FilesModule } from './files/files.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { FilesModule } from './files/files.module';
     UserModule,
     CommonModule,
     FilesModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

@@ -10,6 +10,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { ErrorHandleService } from 'src/common/exception/exception.controller';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import * as bcrypt from 'bcrypt';
+import { JwtPayload } from 'src/auth/interfaces/jwt-interface.payload';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
@@ -19,17 +22,42 @@ export class UserService {
     // ? Patron Repositorio
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    createUserDto.name = createUserDto.name.toLocaleLowerCase();
-    createUserDto.lastname = createUserDto.lastname.toLocaleLowerCase();
+    const { password, ...restoData } = createUserDto;
+    restoData.name = restoData.name.toLocaleLowerCase();
+    restoData.lastname = restoData.lastname.toLocaleLowerCase();
     try {
-      const user = await this.userModel.create(createUserDto);
-      return user;
+      const user = await this.userModel.create({
+        ...restoData,
+        password: bcrypt.hashSync(password, 10),
+      });
+      // validar y quitar
+      /*const data = {
+        id: user.id,
+        name: user.name,
+        lastname: user.lastname,
+        email: user.email,
+        addres: user.address,
+        img: user.img,
+        rol: user.rol,
+      };*/
+
+      // TODO retornar el jwt de acceso
+      return {
+        user,
+        token: this.getJwtToken({ email: user.email }),
+      };
     } catch (error) {
       this.errorHandler.errorHandleException(error);
     }
+  }
+
+  private getJwtToken(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 
   async findAll(paginationDto: PaginationDto) {
@@ -65,17 +93,30 @@ export class UserService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     let user: User;
+    let pass = String;
 
-    if (updateUserDto.name) {
+    const { password, ...restoData } = updateUserDto;
+
+    if (restoData.name) {
       updateUserDto.name = updateUserDto.name.toLocaleLowerCase();
     }
 
-    if (updateUserDto.lastname) {
+    if (restoData.lastname) {
       updateUserDto.lastname = updateUserDto.lastname.toLocaleLowerCase();
     }
 
+    // TODO validar que la contraseña enviada es diferente a la que esta en la bd y actualizarla
+    if (password) {
+      pass = bcrypt.hashSync(password, 10);
+    }
+
+    const data = {
+      pass,
+      ...restoData,
+    };
+
     try {
-      user = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
+      user = await this.userModel.findByIdAndUpdate(id, data, {
         new: true,
       });
       return user;
