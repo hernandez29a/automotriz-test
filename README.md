@@ -22,52 +22,35 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ npm install
+# Ejecutar en Desarrollo
+1. Clonar el repositorio
+2. Ejecutar el comando de 
+```
+npm install
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+3. Tener Nest CLI Instalado
+```
+npm i -g @nestjs/cli
 ```
 
-## Test
+4. Clonar el archivo __.env.template__ y nemombrar la copia a __.env__ 
 
-```bash
-# unit tests
-$ npm run test
+5. Llenar las variables de entorno definidas en el  ```.env```
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+6. Levantar la Base de datos
+```
+docker-compose up -d
 ```
 
-## Support
+7. Ejecutar la aplicacion de desarrollo en dev con el comando:
+```
+npm run start:dev
+```
+8. Crear un usuario y en la bd cambiar el rol a ADMIN_ROLE para poder eliminar y modificar un usuario
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+## Stack Usado
+* MongoDB
+* Nest
+* Docker
